@@ -1,3 +1,35 @@
+"""Webscraping script to get permalinks from Primo ILS
+
+This script takes a list of Primo search URLs from a CSV as input
+and returns a list of Primo Permalinks to a CSV output file.
+This uses Selenium to load the website into a headless browser, which
+requires having the Chrome webdriver. See the Selenium documentation
+for more information on usage:
+https://www.selenium.dev/documentation/webdriver/
+
+To create the Primo search URLs, use a spreadsheet program to concatenate
+a search string of the item's bibnumber in quote and included in the search
+string. The bibnumber used in the Ursus permalinks does not have the final
+digit, but this is a check-digit so we can use the * wildcard in its place
+and still find the correct item in Primo the vast majority of the time.
+
+The search string will have three parts:
+1. https://maine.primo.exlibrisgroup.com/discovery/search?query=any,contains,%22
+2. bibnumber* (e.g. b1234567*)
+3. %22&tab=LibraryCatalog&search_scope=MyInstitution&vid=01MAINE_INST:USM&offset=0
+
+Concatenate those strings to get the Primo search URLs, which are then used
+to locate the new AlmaIDs for each item. The AlmaID is the final
+part of the permalinks.
+
+In the Primo permalink before the AlmaID is a key that is calculated
+based on the search parameters. Using the strings above, the key will
+be "5j44tu". If you decide to use other search parameters you may
+find a different key. As far as I can tell as long as you use a valid
+key there are no problems with the final permalinks, which is why I have
+hardcoded the key into the base_url variable.
+"""
+
 import csv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
